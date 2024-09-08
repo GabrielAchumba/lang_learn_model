@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  llm_simulation:
+    build:
+      context: ./llm_simulation
+    container_name: llm_simulation_service
+    ports:
+      - "8001:8001"
+    networks:
+      - llm_network
+    depends_on:
+      - mongo_db
+    environment:
+      MONGO_URI: mongodb://mongodb:27017
+      MONGO_DB: llm_benchmark_db
+
+  llm_aggregator:
+    build:
+      context: ./llm_aggregation
+    container_name: llm_aggregation_service
+    ports:
+      - "8002:8002"
+    networks:
+      - llm_network
+    depends_on:
+      - mongo_db
+    environment:
+      MONGO_URI: mongodb://mongodb:27017
+      MONGO_DB: llm_benchmark_db
+
+  mongo_db:
+    image: mongo:latest
+    container_name: mongo_db
+    ports:
+      - "27017:27017"
+    networks:
+      - llm_network
+
+networks:
+  llm_network:
+    driver: bridge

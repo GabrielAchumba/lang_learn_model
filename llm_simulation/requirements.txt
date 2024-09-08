@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+databases
+pymongo 
+python-dotenv
+motor
