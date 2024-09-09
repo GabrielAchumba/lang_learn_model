@@ -9,12 +9,13 @@ llm_router = APIRouter()
 
 @llm_router.post("/llms")
 async def create_llm(llm_data: CreateLLMDTO, controller: LLMController = Depends(get_llm_controller)):
+    print("create_llm")
     return await controller.create_llm_controller(llm_data)
 
 
 @llm_router.get("/llms")
 async def get_all_llms(controller: LLMController = Depends(get_llm_controller)):
-    print("seen")
+    print("get_all_llms")
     return await controller.get_all_llms_controller()
 
 

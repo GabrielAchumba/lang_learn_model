@@ -19,8 +19,8 @@ simulations_collection = db['simulations']
 
 
 class RankingService(IRankingService):
-    async def rank_llms(self, ranking_input_data : RankingInputDTO):
-
+    # Implement the required abstract method from IRankingService
+    async def ranking_by_metric(self, ranking_input_data: RankingInputDTO):
         metric = ranking_input_data.metric
         pipeline = [
             {"$match": {"metric": metric}},
@@ -31,4 +31,8 @@ class RankingService(IRankingService):
         first_set_numbers = ranking_input_data.first_set_numbers
 
         results = await simulations_collection.aggregate(pipeline).to_list(length=first_set_numbers)
+        # Convert ObjectId to string
+        for result in results:
+            result["_id"] = str(result["_id"])
+        
         return results

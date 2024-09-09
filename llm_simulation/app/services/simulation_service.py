@@ -12,7 +12,6 @@ from ..interfaces.metric.metric_service_interface import IMetricService
 from ..services.metric_service import MetricService
 from ..services.llm_service import LLMService
 from ..interfaces.llm.llm_service_interface import ILLMService
-from ..services.simulation_service import SimulationResultModel
 
 # Load environment variables
 load_dotenv()
@@ -33,30 +32,28 @@ async def get_metric_service() -> IMetricService:
 async def get_llm_service() -> ILLMService:
     return LLMService()
 
-# Inject the MetricController with the MetricService as dependency
-async def get_dependecy_services(metric_service: IMetricService = Depends(get_metric_service),
-                                 llm_service: ILLMService = Depends(get_llm_service)):
+# Inject the SimulationService with its dependencies
+async def get_dependecy_services(
+    metric_service: IMetricService = Depends(get_metric_service),
+    llm_service: ILLMService = Depends(get_llm_service)
+) -> ISimulationService:
     return SimulationService(metric_service, llm_service)
 
 
 class SimulationService(ISimulationService):
-
     def __init__(self, metric_service: IMetricService, llm_service: ILLMService):
         self.metric_service = metric_service
-        self.llm_service = llm_service
+        self.llm_service = llm_service 
 
-
-    async def simulate(self,  simulation_input_data : SimulationInputDTO) -> str:
-
-        llms = self.llm_service.get_llms()
+    async def simulate(self, simulation_input_data: SimulationInputDTO) -> str:
+        llms = await self.llm_service.get_llms()
         if not llms:
             return "LLMs is an empty list"
 
-        metrics = self.metric_service.get_metrics()
+        metrics = await self.metric_service.get_metrics()
         if not metrics:
             return "Metrics is an empty list"
-        
-        
+
         try:
             data_points = simulation_input_data.data_points
             start_number = simulation_input_data.start_number
@@ -66,12 +63,12 @@ class SimulationService(ISimulationService):
                 for metric in metrics:
                     data_points = [random.uniform(start_number, end_number) for _ in range(data_points)]
                     new_simulation_input_data = {
-                        "llm": llm,
-                        "metric": metric,
+                        "llm": llm.llm,
+                        "metric": metric.metric,
                         "data_points": data_points
                     }
                     result = await simulations_collection.insert_one(new_simulation_input_data)
                     result_id = result.inserted_id
-                    return  f"LLM simulation completed and stored successfully. Simulation result id = {result_id}"
+                    return f"LLM simulation completed and stored successfully. Simulation result id = {result_id}"
         except ValueError:
-             return "An error occured"
+            return "An error occurred"

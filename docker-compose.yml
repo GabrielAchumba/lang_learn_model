@@ -12,7 +12,7 @@ services:
     depends_on:
       - mongo_db
     environment:
-      MONGO_URI: mongodb://mongodb:27017
+      MONGO_URI: mongodb://mongo_db:27017
       MONGO_DB: llm_benchmark_db
 
   llm_aggregator:
@@ -26,8 +26,18 @@ services:
     depends_on:
       - mongo_db
     environment:
-      MONGO_URI: mongodb://mongodb:27017
+      MONGO_URI: mongodb://mongo_db:27017
       MONGO_DB: llm_benchmark_db
+
+  api_gateway:
+    image: nginx:latest
+    container_name: api_gateway
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - llm_network
 
   mongo_db:
     image: mongo:latest
