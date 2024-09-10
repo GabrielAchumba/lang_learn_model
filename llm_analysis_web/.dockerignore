@@ -1,0 +1,31 @@
+# Node modules
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Quasar build directories
+/dist
+/.quasar
+/.cache
+
+# Vite build directory
+/.vite
+
+# IDE/Editor specific files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# MacOS-specific files
+.DS_Store
+
+# Docker-specific
+.dockerignore
+Dockerfile
+
+# Test and local environment files
+/tests
+.env
