@@ -18,6 +18,30 @@ client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
 db = client[MONGO_DB]
 metrics_collection = db['metrics']
 
+# Sample data to seed
+seed_data = [
+    {"_id": ObjectId(), "metric": "TTFT"},
+    {"_id": ObjectId(), "metric": "TPS"},
+    {"_id": ObjectId(), "metric": "e2e_latency"},
+    {"_id": ObjectId(), "metric": "RPS"},
+]
+
+async def get_metrics() -> List[MetricModel]:
+    metrics = []
+    async for metric in metrics_collection.find():
+        metrics.append(MetricModel(**metric))
+    return metrics
+
+# Function to seed the database
+async def seed_metrics():
+    # Check if data already exists
+    llms = await get_metrics()
+    if len(llms) == 0:
+        metrics_collection.insert_many(seed_data)
+        print("Database seeded with initial data.")
+    else:
+        print("Database already has data. Skipping seeding.")
+
 
 class MetricService(IMetricService):
     async def create_metric(self, metric_data: CreateMetricDTO) -> MetricModel:

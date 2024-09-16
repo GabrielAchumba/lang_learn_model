@@ -4,7 +4,7 @@ from ...models.llm_model import LLMModel
 from typing import Optional, List
 
 class ILLMService(ABC):
-    
+        
     @abstractmethod
     async def create_llm(self, llm_dto : CreateLLMDTO) -> LLMModel:
         pass
